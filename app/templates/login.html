@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% set hide_navbar = True %}
+{% block content %}
+
+<!-- Background wrapper -->
+<section class="hero-section d-flex align-items-center" 
+         style="min-height: 100vh; background: url('/static/images/bg.jpg') center/cover no-repeat; 
+                position: relative;">
+
+  <!-- Overlay for blur/hidden effect -->
+  <div style="position: absolute; top:0; left:0; width:100%; height:100%; 
+              background-color: rgba(0,0,0,0.45); backdrop-filter: blur(6px); z-index:1;"></div>
+
+  <!-- Login card -->
+  <div class="container d-flex justify-content-center align-items-center" style="z-index:2;">
+    <div class="card shadow-lg" style="max-width: 450px; width: 100%; 
+                background-color: rgba(255, 255, 255, 0.92); border-radius: 12px;">
+      <div class="card-body p-4">
+        <h3 class="mb-4 text-center fw-bold">
+          {% if lang == 'en' %} Login {% else %} تسجيل الدخول {% endif %}
+        </h3>
+
+        <form method="post" novalidate>
+          <!-- Username -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold">
+              {% if lang == 'en' %} Username {% else %} اسم المستخدم {% endif %}
+            </label>
+            <input type="text" name="username" class="form-control form-control-lg rounded-pill"
+                   required value="{{ (form.username if form else '') }}">
+          </div>
+
+          <!-- Password -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold">
+              {% if lang == 'en' %} Password {% else %} كلمة المرور {% endif %}
+            </label>
+            <input type="password" name="password" class="form-control form-control-lg rounded-pill" required>
+          </div>
+
+          <!-- Submit -->
+          <button type="submit" class="btn btn-primary btn-lg w-100 rounded-pill shadow-sm">
+            {% if lang == 'en' %} Login {% else %} تسجيل الدخول {% endif %}
+          </button>
+
+          <!-- Link to register -->
+          <div class="mt-3 text-center">
+            <a href="{{ url_for('main.register', lang=lang) }}" class="text-decoration-none fw-semibold">
+              {% if lang == 'en' %} Create new account {% else %} إنشاء حساب جديد {% endif %}
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,199 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+  body {
+    background-image: none !important;
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364) !important;
+    color: #f1f1f1;
+  }
+</style>
+
+<style>
+  .chatbot-box {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 20px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    padding: 20px;
+  }
+  .chat-window {
+    background: #fefefe;
+    border-radius: 15px;
+    border: 1px solid #ddd;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+  }
+  .bot-message {
+    background: #eef3ff;
+    color: #1e3c72;
+    padding: 10px 14px;
+    border-radius: 12px;
+    display: inline-block;
+    max-width: 80%;
+  }
+  .user-message {
+    background: #d1ffd6;
+    color: #055c1f;
+    padding: 10px 14px;
+    border-radius: 12px;
+    display: inline-block;
+    max-width: 80%;
+    text-align: right;
+    float: none;
+    clear: both;
+  }
+  #chat-input {
+    border-radius: 12px;
+    border: 1px solid #ccc;
+    padding: 10px;
+  }
+  .btn-primary {
+    border-radius: 12px;
+    font-weight: bold;
+    padding: 10px 20px;
+  }
+  .btn-warning {
+    border-radius: 12px;
+    font-weight: bold;
+  }
+  .description-box {
+    border-radius: 20px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+  }
+</style>
+
+<div class="guidebot-container container py-5">
+
+  <!-- Description Section -->
+  <div class="description-box text-center p-5 mb-5" 
+       style="background: linear-gradient(135deg, #1e3c72, #2a5298); color: #fff;">
+    {% if request.args.get('lang') == 'en' %}
+      <h2 class="mb-3 fw-bold" style="font-size: 2rem;">🤖 GuideBot – Your Conflict Assistant</h2>
+      <p class="lead">
+        GuideBot helps you <strong>verify news</strong>, get <strong>safety tips</strong>, 
+        and <strong>make informed decisions</strong> during Sudan’s conflict.
+      </p>
+    {% else %}
+      <h2 class="mb-3 fw-bold" style="font-size: 2rem;">🤖 دليل البوت – مساعدك في النزاعات</h2>
+      <p class="lead">
+        يساعدك GuideBot على <strong>التحقق من الأخبار</strong>، 
+        الحصول على <strong>نصائح أمان</strong>, 
+        واتخاذ <strong>قرارات واعية</strong> أثناء النزاع.
+      </p>
+    {% endif %}
+  </div>
+
+  <!-- Chatbot Box -->
+  <div class="chatbot-box mx-auto" style="max-width: 800px;">
+    <div class="chat-window p-3 mb-3" id="chat-window" style="height: 380px; overflow-y: auto;">
+      <div class="bot-message mb-3">
+        {% if request.args.get('lang') == 'en' %}
+          👋 Hello! I can verify Sudan news, give you safety tips, or help with decision support.
+        {% else %}
+          👋 أهلاً! أستطيع التحقق من الأخبار، إعطاؤك نصائح أمان، أو مساعدتك في دعم القرار.
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Safety Tip Button -->
+    <div class="chat-options mt-3 text-center">
+      {% if request.args.get('lang') == 'en' %}
+        <button class="btn btn-warning shadow-sm fw-bold" onclick="showSafetyTip()">🛡 Safety Tips</button>
+      {% else %}
+        <button class="btn btn-warning shadow-sm fw-bold" onclick="showSafetyTip()">🛡 نصائح أمان</button>
+      {% endif %}
+    </div>
+
+    <!-- Input -->
+    <div class="mt-3 d-flex">
+      <input id="chat-input" class="form-control me-2"
+             placeholder="{{ 'Type your question...' if request.args.get('lang') == 'en' else 'اكتب سؤالك...' }}">
+      <button id="send-btn" class="btn btn-primary">
+        {{ 'Send' if request.args.get('lang') == 'en' else 'إرسال' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ✅ Load axios -->
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+<!-- ✅ Chat logic -->
+<script>
+  const LANG = "{{ request.args.get('lang', 'en') }}";
+  const chatWindow = document.getElementById("chat-window");
+  const inputEl = document.getElementById("chat-input");
+  const sendBtn = document.getElementById("send-btn");
+
+  const safetyTips = LANG === 'ar'
+    ? [
+        "📍 ابقَ بعيدًا عن مناطق النزاع المباشر.",
+        "🚰 احرص على تخزين مياه الشرب النقية.",
+        "📞 احتفظ بأرقام الطوارئ في متناول اليد.",
+        "🧰 جهّز حقيبة إسعافات أولية بسيطة.",
+        "🔋 احتفظ بمصدر بديل للطاقة مثل بنك طاقة."
+      ]
+    : [
+        "📍 Stay away from active conflict zones.",
+        "🚰 Keep clean drinking water stored.",
+        "📞 Always keep emergency numbers accessible.",
+        "🧰 Prepare a basic first aid kit.",
+        "🔋 Keep a backup power source like a power bank."
+      ];
+  let tipIndex = 0;
+
+  function showSafetyTip() {
+    if (tipIndex < safetyTips.length) {
+      addMessage("bot-message", safetyTips[tipIndex]);
+      tipIndex++;
+    } else {
+      addMessage("bot-message", LANG === 'ar' ? "✅ انتهت جميع النصائح." : "✅ No more tips available.");
+    }
+  }
+
+  function addMessage(cssClass, html) {
+    const div = document.createElement("div");
+    div.className = cssClass + " mb-2";
+    div.innerHTML = html;
+    chatWindow.appendChild(div);
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+    return div;
+  }
+
+  function escapeHtml(s) {
+    const p = document.createElement('p');
+    p.innerText = s;
+    return p.innerHTML;
+  }
+
+  async function sendToBot(message) {
+    if (!message) return;
+    addMessage("user-message", escapeHtml(message));
+
+    const processing = addMessage("bot-message", LANG === 'ar' ? "جاري المعالجة..." : "Processing...");
+
+    try {
+      const res = await axios.post("/api/chat", { message, lang: LANG, intent: "auto" });
+      processing.remove();
+      addMessage("bot-message", escapeHtml(res.data.reply || (LANG === 'ar' ? "لا توجد إجابة" : "No reply")));
+    } catch (e) {
+      processing.remove();
+      addMessage("bot-message", LANG === 'ar' ? "⚠ خطأ: تعذر الاتصال بالخادم." : "⚠ Error: Could not connect to server.");
+    }
+  }
+
+  function sendText() {
+    const msg = (inputEl.value || "").trim();
+    if (!msg) return;
+    sendToBot(msg);
+    inputEl.value = "";
+  }
+
+  // ✅ Hook button + Enter
+  sendBtn.addEventListener("click", sendText);
+  inputEl.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendText();
+    }
+  });
+</script>
+{% endblock %}

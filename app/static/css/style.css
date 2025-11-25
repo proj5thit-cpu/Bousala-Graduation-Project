@@ -4,7 +4,7 @@ body, html {
     padding: 0;
     font-family: 'Segoe UI', 'Tahoma', 'Arial', 'Cairo', sans-serif;
     direction: ltr;
-    background: url("/static/img/bg.jpg") no-repeat center center fixed;
+    
     background-size: cover;
 }
 
@@ -124,7 +124,7 @@ body, html {
 }
 
 .about-section .overlay-box {
-    background-color: rgba(0, 0, 0, 0.5); /* Dark transparent overlay */
+    background-color: rgba(70, 187, 208, 0.697); /* Dark transparent overlay */
     padding: 2rem;
     border-radius: 12px;
     margin-bottom: 1.5rem;
